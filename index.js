@@ -1,11 +1,25 @@
-var rl, readline = require('readline');
+/** This module is a wrapper for the readline module */
+var rl, readline = require('readline'); 
 
+/** 
+ * Creates a user interface
+ * @param stdin - input coming from terminal
+ * @param stdout - output to the terminal
+ * @returns rl
+ */
 var get_interface = function(stdin, stdout) {
   if (!rl) rl = readline.createInterface(stdin, stdout);
   else stdin.resume(); // interface exists
   return rl;
 }
 
+/** 
+ * Gives user a confirmation message and checks to see if the reply 
+ * is a confirmation or not
+ * @param {string} message - confirmation message.
+ * @param {function} callback - function to be called when user replies
+ * @returns {function} callback - callback function
+*/
 var confirm = exports.confirm = function(message, callback) {
 
   var question = {
@@ -23,6 +37,12 @@ var confirm = exports.confirm = function(message, callback) {
 
 };
 
+/** 
+ * receives a reply from the user
+ * @param {array} options - valid options that the user can choose from
+ * @param {function} callback - function to be called when user replies
+ * @returns {function} callback - callback function
+*/
 var get = exports.get = function(options, callback) {
 
   if (!callback) return; // no point in continuing
@@ -35,11 +55,13 @@ var get = exports.get = function(options, callback) {
       stdout = process.stdout,
       fields = Object.keys(options);
 
+/** Ends the interaction */
   var done = function() {
     close_prompt();
     callback(null, answers);
   }
 
+/** closes out the interface */
   var close_prompt = function() {
     stdin.pause();
     if (!rl) return;
@@ -47,6 +69,7 @@ var get = exports.get = function(options, callback) {
     rl = null;
   }
 
+/** */
   var get_default = function(key, partial_answers) {
     if (typeof options[key] == 'object')
       return typeof options[key].default == 'function' ? options[key].default(partial_answers) : options[key].default;
