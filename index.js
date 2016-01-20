@@ -69,7 +69,12 @@ var get = exports.get = function(options, callback) {
     rl = null;
   }
 
-/** */
+/** 
+ * gets the default value when no input is given
+ * @param {string} key - specifies the option
+ * @param {string} partial_answers - partial answer given by user
+ * @returns {string} default - default answer/data for given key
+ */
   var get_default = function(key, partial_answers) {
     if (typeof options[key] == 'object')
       return typeof options[key].default == 'function' ? options[key].default(partial_answers) : options[key].default;
@@ -77,6 +82,11 @@ var get = exports.get = function(options, callback) {
       return options[key];
   }
 
+/**
+ * guesses the type of the answer based on the user's input
+ * @param {string} reply - user's input
+ * @returns {boolean|number|string|password} reply  
+  */
   var guess_type = function(reply) {
 
     if (reply.trim() == '')
@@ -91,6 +101,12 @@ var get = exports.get = function(options, callback) {
     return reply;
   }
 
+/** 
+ * checks if user response is valid based on the given option
+ * @param {string} key - specifies the option
+ * @param {string} answer - user's input
+ * @returns {boolean}
+*/
   var validate = function(key, answer) {
 
     if (typeof answer == 'undefined')
@@ -108,6 +124,10 @@ var get = exports.get = function(options, callback) {
 
   }
 
+/**
+ * shows an error message and informs users of valid options
+ * @param {string} key - specifies the option
+ */
   var show_error = function(key) {
     var str = options[key].error ? options[key].error : 'Invalid value.';
 
@@ -117,6 +137,10 @@ var get = exports.get = function(options, callback) {
     stdout.write("\033[31m" + str + "\033[0m" + "\n");
   }
 
+/**
+ * Shows a message of the available options for the given key
+ * @param {string} key - specifies the option
+ */
   var show_message = function(key) {
     var msg = '';
 
@@ -130,11 +154,21 @@ var get = exports.get = function(options, callback) {
   }
 
   // taken from commander lib
+  /**
+   * hides the password as user inputs characters
+   * @params {array} prompt - prompt for password
+   * @params {function} callback - function to be called 
+   */
   var wait_for_password = function(prompt, callback) {
 
     var buf = '',
         mask = '*';
-
+/**
+ * hides the password and closes when completed
+ * @param {string} c - indicator to close out
+ * @param {string} key - key that user pressed
+ * @returns {function} callback 
+ */
     var keypress_callback = function(c, key) {
 
       if (key && (key.name == 'enter' || key.name == 'return')) {
@@ -162,6 +196,13 @@ var get = exports.get = function(options, callback) {
     stdin.on('keypress', keypress_callback);
   }
 
+/**
+ * checks the user's response and throws an error is needed
+ * @param {number} index - index of the current option
+ * @param {string} curr_key - current option
+ * @param {string} fallback - default answer
+ * @param {string} reply - user input
+ */
   var check_reply = function(index, curr_key, fallback, reply) {
     var answer = guess_type(reply);
     var return_answer = (typeof answer != 'undefined') ? answer : fallback;
@@ -172,6 +213,11 @@ var get = exports.get = function(options, callback) {
       show_error(curr_key) || next_question(index); // repeats current
   }
 
+/**
+ * checks if all the conditions are met
+ * @param {number} conds - conditions
+ * @returns {boolean}
+ */
   var dependencies_met = function(conds) {
     for (var key in conds) {
       var cond = conds[key];
@@ -190,6 +236,13 @@ var get = exports.get = function(options, callback) {
     return true;
   }
 
+/**
+ * Keeps asking the next question until there is none left
+ * @param {number} index - index of current option
+ * @param {number} prev_key - previous option
+ * @param {string} answer - user's input
+ * @returns {function} asks for next question if there is one
+ */
   var next_question = function(index, prev_key, answer) {
     if (prev_key) answers[prev_key] = answer;
 
